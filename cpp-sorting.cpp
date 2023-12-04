@@ -12,27 +12,29 @@ void rect_vector_from_int(std::vector<sf::RectangleShape>& rect_vector, const st
 void change_rect_color(std::vector<sf::RectangleShape>& rect_vector, int index, sf::Color color);
 void draw_rectangles(const std::vector<sf::RectangleShape>& rect_vector);
 void reset_rect_colors(std::vector<sf::RectangleShape>& rect_vector);
+void insertion_sort_visual(const std::vector<int>& unsorted_vector);
 
 bool is_sorting_done = false;
 
-sf::RenderWindow window(sf::VideoMode(1000, 700), "Sorting");
+sf::RenderWindow window(sf::VideoMode(1900, 700), "Sorting");
 
 sf::Vector2u windowSize = window.getSize();
 int window_bottomX = 0;
 int window_bottomY = windowSize.y;
 int window_width = windowSize.x;
 
-const int VECTOR_SIZE = 200;
-const int RECT_OFFSET = 1;
-const float REFRESH_DELAY = 0;
+const int VECTOR_SIZE = 30;
+const int RECT_OFFSET = 0;
+const float REFRESH_DELAY = 0.1;
 const sf::Color RECT_COLOR = sf::Color::Blue;
 const sf::Color SELECTION_COLOR = sf::Color::Magenta;
 
-int rect_width = (window_width - (VECTOR_SIZE * RECT_OFFSET)) / VECTOR_SIZE ;
-
+int rect_width = (window_width - (VECTOR_SIZE * RECT_OFFSET)) / VECTOR_SIZE;
 
 int main() {
-    
+
+    rect_width = (rect_width == 0) ? 1 : rect_width;
+
     std::vector<int> unsort_vect = generate_random_vector(VECTOR_SIZE);
 
     while (window.isOpen()) {
@@ -45,13 +47,59 @@ int main() {
 
         if (!is_sorting_done) {
 
-            bubble_sort_visual(unsort_vect);
+            insertion_sort_visual(unsort_vect);
 
             is_sorting_done = true;
         }
     }
-
     return EXIT_SUCCESS;
+}
+
+void insertion_sort_visual(const std::vector<int>& unsorted_vector) {
+    std::vector<int> sort_vector = unsorted_vector;
+
+    std::vector<int> buffer;
+    std::vector<int> combined_vector;
+
+    std::vector<sf::RectangleShape> rect_vector;
+
+    for (int i = 0; i < sort_vector.size(); i++) {
+        sf::sleep(sf::seconds(REFRESH_DELAY));
+
+        
+        //rect_vector_from_int(rect_vector, combined_vector);
+
+
+        int buffer_num = sort_vector[i];
+
+        for (int j = 0; j < sort_vector.size(); j++) {
+
+            //change_rect_color(rect_vector, j, SELECTION_COLOR);
+            if (j >= buffer.size()) {
+                buffer.push_back(buffer_num);
+                break;
+            }
+            if (buffer[j] >= buffer_num) {
+                buffer.insert(buffer.begin() + j, buffer_num);
+                break;
+            }
+            else {
+                continue;
+            }
+            //window.clear();
+            //window.display();
+
+        }
+
+        // Объединение буфферного и неотсортированного векторов для плавной отрисовки
+        combined_vector.clear();
+        combined_vector.insert(combined_vector.begin(), buffer.begin(), buffer.end());
+        combined_vector.insert(combined_vector.end(), sort_vector.begin() + buffer.size(), sort_vector.end());
+
+        rect_vector_from_int(rect_vector, combined_vector);
+
+        //change_rect_color(rect_vector, i, SELECTION_COLOR);
+    }
 }
 
 void bubble_sort_visual(const std::vector<int>& unsorted_vector) {
