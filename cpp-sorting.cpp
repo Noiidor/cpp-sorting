@@ -15,19 +15,25 @@ void reset_rect_colors(std::vector<sf::RectangleShape>& rect_vector);
 
 bool is_sorting_done = false;
 
-sf::RenderWindow window(sf::VideoMode(700, 700), "Sorting");
+sf::RenderWindow window(sf::VideoMode(1000, 700), "Sorting");
 
 sf::Vector2u windowSize = window.getSize();
-float bottomX = static_cast<float>(windowSize.x / 6);
-float bottomY = static_cast<float>(windowSize.y / 1.1);
+int window_bottomX = 0;
+int window_bottomY = windowSize.y;
+int window_width = windowSize.x;
 
-const float REFRESH_DELAY = 0.05;
-const sf::Color VECTOR_COLOR = sf::Color::Blue;
+const int VECTOR_SIZE = 200;
+const int RECT_OFFSET = 1;
+const float REFRESH_DELAY = 0;
+const sf::Color RECT_COLOR = sf::Color::Blue;
 const sf::Color SELECTION_COLOR = sf::Color::Magenta;
+
+int rect_width = (window_width - (VECTOR_SIZE * RECT_OFFSET)) / VECTOR_SIZE ;
+
 
 int main() {
     
-    std::vector<int> unsort_vect = generate_random_vector(30);
+    std::vector<int> unsort_vect = generate_random_vector(VECTOR_SIZE);
 
     while (window.isOpen()) {
         
@@ -58,8 +64,6 @@ void bubble_sort_visual(const std::vector<int>& unsorted_vector) {
     while (!std::is_sorted(sort_vector.begin(), sort_vector.end())) {
         sf::sleep(sf::seconds(REFRESH_DELAY));
 
-        window.clear();
-
         rect_vector_from_int(rect_vector, sort_vector);
 
 
@@ -89,15 +93,15 @@ void rect_vector_from_int(std::vector<sf::RectangleShape>& rect_vector, const st
     int offset = 0;
     for (int i = 0; i < vect.size(); i++) // Отрисовка вектора в виде прямоугольников
     {
-        offset += 15;
-
         int value = vect[i];
 
-        sf::RectangleShape rect(sf::Vector2f(10, value * -4));
+        sf::RectangleShape rect(sf::Vector2f(rect_width, value * -4));
 
         rect.setFillColor(sf::Color::Blue);
-        rect.setOrigin(-bottomX, -bottomY);
+        rect.setOrigin(-window_bottomX, -window_bottomY);
         rect.setPosition(offset, 0);
+
+        offset += rect_width + RECT_OFFSET;
 
         rect_vector.push_back(rect);
     }
@@ -110,7 +114,7 @@ void reset_rect_colors(std::vector<sf::RectangleShape>& rect_vector) {
     window.clear();
 
     for (sf::RectangleShape rect : rect_vector) {
-        rect.setFillColor(VECTOR_COLOR);
+        rect.setFillColor(RECT_COLOR);
         window.draw(rect);
     }
 
@@ -123,6 +127,9 @@ void change_rect_color(std::vector<sf::RectangleShape>& rect_vector, int index, 
 }
 
 void draw_rectangles(const std::vector<sf::RectangleShape>& rect_vector) {
+
+    window.clear();
+
     for (const sf::RectangleShape rect : rect_vector) {
         window.draw(rect);
     }
