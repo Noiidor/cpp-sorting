@@ -21,7 +21,7 @@ sf::Vector2u windowSize = window.getSize();
 float bottomX = static_cast<float>(windowSize.x / 6);
 float bottomY = static_cast<float>(windowSize.y / 1.1);
 
-const float REFRESH_DELAY = 0.001;
+const float REFRESH_DELAY = 0.05;
 const sf::Color VECTOR_COLOR = sf::Color::Blue;
 const sf::Color SELECTION_COLOR = sf::Color::Magenta;
 
@@ -77,13 +77,9 @@ void bubble_sort_visual(const std::vector<int>& unsorted_vector) {
         else sort_vector_index++;
 
     }
-    //СДЕЛАТЬ ПОСЛЕДНЮЮ ОТРИСОВКУ ПОСЛЕ КОНЦА СОРТИРОВКИ
 
-    rect_vector_from_int(rect_vector, sort_vector);
+    rect_vector_from_int(rect_vector, sort_vector); // Последний апдейт после полной сортировки
     reset_rect_colors(rect_vector);
-
-
-    
 }
 
 void rect_vector_from_int(std::vector<sf::RectangleShape>& rect_vector, const std::vector<int>& vect) {
@@ -110,10 +106,14 @@ void rect_vector_from_int(std::vector<sf::RectangleShape>& rect_vector, const st
 }
 
 void reset_rect_colors(std::vector<sf::RectangleShape>& rect_vector) {
+
+    window.clear();
+
     for (sf::RectangleShape rect : rect_vector) {
         rect.setFillColor(VECTOR_COLOR);
         window.draw(rect);
     }
+
     window.display();
 }
 
