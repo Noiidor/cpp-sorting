@@ -13,21 +13,23 @@ void change_rect_color(std::vector<sf::RectangleShape>& rect_vector, int index, 
 void draw_rectangles(const std::vector<sf::RectangleShape>& rect_vector);
 void reset_rect_colors(std::vector<sf::RectangleShape>& rect_vector);
 void insertion_sort_visual(const std::vector<int>& unsorted_vector);
+std::vector<int> combine_vectors(const std::vector<int>& first, std::vector<int>::const_iterator merge_pos, const std::vector<int>& second);
 
 bool is_sorting_done = false;
 
-sf::RenderWindow window(sf::VideoMode(1900, 700), "Sorting");
+sf::RenderWindow window(sf::VideoMode(1700, 700), "Sorting");
 
 sf::Vector2u windowSize = window.getSize();
 int window_bottomX = 0;
 int window_bottomY = windowSize.y;
 int window_width = windowSize.x;
 
-const int VECTOR_SIZE = 30;
-const int RECT_OFFSET = 0;
-const float REFRESH_DELAY = 0.1;
+const int VECTOR_SIZE = 200;
+const int RECT_OFFSET = 1;
+const float REFRESH_DELAY = 0.001;
 const sf::Color RECT_COLOR = sf::Color::Blue;
 const sf::Color SELECTION_COLOR = sf::Color::Magenta;
+const sf::Color SECONDARY_SELECTION_COLOR = sf::Color::Green;
 
 int rect_width = (window_width - (VECTOR_SIZE * RECT_OFFSET)) / VECTOR_SIZE;
 
@@ -56,25 +58,29 @@ int main() {
 }
 
 void insertion_sort_visual(const std::vector<int>& unsorted_vector) {
-    std::vector<int> sort_vector = unsorted_vector;
+
+    std::vector<sf::RectangleShape> rect_vector;
 
     std::vector<int> buffer;
     std::vector<int> combined_vector;
 
-    std::vector<sf::RectangleShape> rect_vector;
+    for (int i = 0; i < unsorted_vector.size(); i++) {
 
-    for (int i = 0; i < sort_vector.size(); i++) {
-        sf::sleep(sf::seconds(REFRESH_DELAY));
+        // Наложение векторов для визуальной видимости процесса сортировки
+        combined_vector = combine_vectors(buffer, buffer.end(), unsorted_vector);
 
-        
-        //rect_vector_from_int(rect_vector, combined_vector);
+        rect_vector_from_int(rect_vector, combined_vector);
 
+        change_rect_color(rect_vector, i, SECONDARY_SELECTION_COLOR);
 
-        int buffer_num = sort_vector[i];
+        int buffer_num = unsorted_vector[i];
 
-        for (int j = 0; j < sort_vector.size(); j++) {
+        for (int j = 0; j < unsorted_vector.size(); j++) {
 
-            //change_rect_color(rect_vector, j, SELECTION_COLOR);
+            sf::sleep(sf::seconds(REFRESH_DELAY));
+
+            change_rect_color(rect_vector, j, SELECTION_COLOR);
+
             if (j >= buffer.size()) {
                 buffer.push_back(buffer_num);
                 break;
@@ -86,20 +92,20 @@ void insertion_sort_visual(const std::vector<int>& unsorted_vector) {
             else {
                 continue;
             }
-            //window.clear();
-            //window.display();
-
         }
-
-        // Объединение буфферного и неотсортированного векторов для плавной отрисовки
-        combined_vector.clear();
-        combined_vector.insert(combined_vector.begin(), buffer.begin(), buffer.end());
-        combined_vector.insert(combined_vector.end(), sort_vector.begin() + buffer.size(), sort_vector.end());
-
-        rect_vector_from_int(rect_vector, combined_vector);
-
-        //change_rect_color(rect_vector, i, SELECTION_COLOR);
     }
+
+    combined_vector = combine_vectors(buffer, buffer.end(), unsorted_vector);
+    rect_vector_from_int(rect_vector, combined_vector);
+    reset_rect_colors(rect_vector);
+}
+
+std::vector<int> combine_vectors(const std::vector<int>& first, std::vector<int>::const_iterator merge_pos, const std::vector<int>& second) {
+    std::vector<int> combined_vector;
+    combined_vector.insert(combined_vector.begin(), first.begin(), merge_pos);
+    if (first.size() + second.begin() == second.end()) return combined_vector;
+    combined_vector.insert(combined_vector.end(), second.begin() + first.size(), second.end());
+    return combined_vector;
 }
 
 void bubble_sort_visual(const std::vector<int>& unsorted_vector) {
@@ -119,7 +125,7 @@ void bubble_sort_visual(const std::vector<int>& unsorted_vector) {
             int& left_num = sort_vector[sort_vector_index];
             change_rect_color(rect_vector, sort_vector_index, SELECTION_COLOR);
             int& right_num = sort_vector[sort_vector_index + 1];
-            change_rect_color(rect_vector, sort_vector_index + 1, sf::Color::Green);
+            change_rect_color(rect_vector, sort_vector_index + 1, SECONDARY_SELECTION_COLOR);
 
             if (left_num > right_num)
                 std::swap(left_num, right_num);
@@ -154,7 +160,7 @@ void rect_vector_from_int(std::vector<sf::RectangleShape>& rect_vector, const st
         rect_vector.push_back(rect);
     }
 
-    draw_rectangles(rect_vector);
+    //draw_rectangles(rect_vector);
 }
 
 void reset_rect_colors(std::vector<sf::RectangleShape>& rect_vector) {
