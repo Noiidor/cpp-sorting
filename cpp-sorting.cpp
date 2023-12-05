@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 
+// Вынести весь этот мусор в header file
 std::vector<int> generate_random_vector(int vector_size);
 void print_vector(const std::vector<int>& intVect);
 std::vector<int> bubble_sort(const std::vector<int>& intVect);
@@ -17,17 +18,17 @@ std::vector<int> combine_vectors(const std::vector<int>& first, std::vector<int>
 
 bool is_sorting_done = false;
 
-sf::RenderWindow window(sf::VideoMode(1700, 700), "Sorting");
+sf::RenderWindow window(sf::VideoMode(1500, 700), "Sorting");
 
 sf::Vector2u windowSize = window.getSize();
 int window_bottomX = 0;
 int window_bottomY = windowSize.y;
 int window_width = windowSize.x;
 
-const int VECTOR_SIZE = 200;
+const int VECTOR_SIZE = 50;
 const int RECT_OFFSET = 1;
-const float REFRESH_DELAY = 0.001;
-const sf::Color RECT_COLOR = sf::Color::Blue;
+const float REFRESH_DELAY = 0.01;
+const sf::Color DEFAULT_COLOR = sf::Color::Blue;
 const sf::Color SELECTION_COLOR = sf::Color::Magenta;
 const sf::Color SECONDARY_SELECTION_COLOR = sf::Color::Green;
 
@@ -57,6 +58,36 @@ int main() {
     return EXIT_SUCCESS;
 }
 
+void bogo_sort_visual(const std::vector<int>& unsorted_vector) {
+    
+    std::vector<sf::RectangleShape> rect_vector;
+
+
+}
+
+bool is_sorted(const std::vector<int>& vect) {
+
+    std::vector<sf::RectangleShape> rect_vector;
+    rect_vector_from_int(rect_vector, vect);
+
+    for (size_t i = 0; i < vect.size(); i++) {
+        sf::sleep(sf::seconds(REFRESH_DELAY/2));
+
+        change_rect_color(rect_vector, i, SECONDARY_SELECTION_COLOR);
+
+        int left_num = vect.at(i);
+        int right_num;
+        if (i == vect.size() - 1) {
+            right_num = left_num;
+        }
+        else {
+            right_num = vect.at(i + 1);
+        }
+        if (left_num > right_num) return false;
+    }
+    return true;
+}
+
 void insertion_sort_visual(const std::vector<int>& unsorted_vector) {
 
     std::vector<sf::RectangleShape> rect_vector;
@@ -79,6 +110,8 @@ void insertion_sort_visual(const std::vector<int>& unsorted_vector) {
 
             sf::sleep(sf::seconds(REFRESH_DELAY));
 
+            //reset_rect_colors(rect_vector);
+            if (j != 0) change_rect_color(rect_vector, j-1, DEFAULT_COLOR);
             change_rect_color(rect_vector, j, SELECTION_COLOR);
 
             if (j >= buffer.size()) {
@@ -98,6 +131,8 @@ void insertion_sort_visual(const std::vector<int>& unsorted_vector) {
     combined_vector = combine_vectors(buffer, buffer.end(), unsorted_vector);
     rect_vector_from_int(rect_vector, combined_vector);
     reset_rect_colors(rect_vector);
+
+    is_sorted(combined_vector);
 }
 
 std::vector<int> combine_vectors(const std::vector<int>& first, std::vector<int>::const_iterator merge_pos, const std::vector<int>& second) {
@@ -168,7 +203,7 @@ void reset_rect_colors(std::vector<sf::RectangleShape>& rect_vector) {
     window.clear();
 
     for (sf::RectangleShape rect : rect_vector) {
-        rect.setFillColor(RECT_COLOR);
+        rect.setFillColor(DEFAULT_COLOR);
         window.draw(rect);
     }
 
