@@ -3,21 +3,8 @@
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 #include <vector>
-
-// Вынести весь этот мусор в header file
-std::vector<int> generate_random_vector(int vector_size);
-void print_vector(const std::vector<int>& intVect);
-std::vector<int> bubble_sort(const std::vector<int>& intVect);
-void bubble_sort_visual(const std::vector<int>& intVect);
-std::vector<int> insertion_sort(const std::vector<int>& intVect);
-void rect_vector_from_int(std::vector<sf::RectangleShape>& rect_vector, const std::vector<int>& vect);
-void change_vert_color(sf::VertexArray& vert_array, int index, sf::Color color);
-void draw_rectangles(const std::vector<sf::RectangleShape>& rect_vector);
-void reset_vert_colors(sf::VertexArray& vert_array);
-void insertion_sort_visual(const std::vector<int>& unsorted_vector);
-std::vector<int> combine_vectors(const std::vector<int>& first, std::vector<int>::const_iterator merge_pos, const std::vector<int>& second);
-void fill_vertex_array(sf::VertexArray& vert_array, const std::vector<int>& vect);
-void draw_vertexes(const sf::VertexArray& vert_array);
+#include <cmath>
+#include "SFML_sorting.h"
 
 bool is_sorting_done = false;
 
@@ -28,7 +15,7 @@ int window_bottomX = 0;
 int window_bottomY = windowSize.y;
 int window_width = windowSize.x;
 
-const int VECTOR_SIZE = 1500;
+const int VECTOR_SIZE = 1600;
 const uint16_t RECT_OFFSET = 0;
 const float REFRESH_DELAY = 0;
 const sf::Color DEFAULT_COLOR = sf::Color::Blue;
@@ -36,6 +23,8 @@ const sf::Color SELECTION_COLOR = sf::Color::Magenta;
 const sf::Color SECONDARY_SELECTION_COLOR = sf::Color::Green;
 
 float rect_width = (window_width - (VECTOR_SIZE * RECT_OFFSET)) / static_cast<float>(VECTOR_SIZE);
+int screen_to_vector_ratio = std::ceil(VECTOR_SIZE / static_cast<double>(window_width));
+
 
 int main() {
 
@@ -72,12 +61,18 @@ void fill_vertex_array(sf::VertexArray& vert_array, const std::vector<int>& vect
 
     sf::Color randomColor(dis(gen), dis(gen), dis(gen));
 
-    //const int max_num = *std::max_element(vect.begin(), vect.end());
     float height_offset = window_bottomY / static_cast<float>(VECTOR_SIZE);
 
     int offset = 0;
-    for (const int i : vect) {
+    bool current_rect;
+    for (int i = 0;i < vect.size(); i++) { // Нужнл что бы отрисовывались все 4 вертекса для прямоугольника, с учетом скипов
     
+        if (i % screen_to_vector_ratio != 0) {
+            offset += rect_width + RECT_OFFSET;
+            current_rect = true;
+            continue;
+        }
+
         /*std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> dis(0, 255);
@@ -87,7 +82,7 @@ void fill_vertex_array(sf::VertexArray& vert_array, const std::vector<int>& vect
         int vertex_origin_posX = window_bottomX + offset;
         int vertex_origin_posY = window_bottomY;
 
-        int vert_top_offset = i * height_offset;
+        int vert_top_offset = vect[i] * height_offset;
 
         // l - left, r - right, b - bottom, t - top
         sf::Vertex vertex_lb;

@@ -135,6 +135,9 @@
   <ItemGroup>
     <ClCompile Include="cpp-sorting.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SFML_sorting.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
